@@ -1,0 +1,56 @@
+<div class="flex min-h-svh items-center justify-center bg-surface-muted px-4 py-10">
+  <div class="w-full max-w-md">
+    <app-card padding="lg" ariaLabel="Crear cuenta">
+      <form (submit)="handleSubmit($event)" class="flex flex-col gap-4" novalidate>
+        <div>
+          <h1 class="font-heading text-xl font-semibold text-ink">Crea tu cuenta</h1>
+          <p class="mt-1 text-sm text-ink-muted">Registra tu clínica y comienza en el plan Free.</p>
+        </div>
+
+        @if (serverError()) {
+          <app-alert variant="danger">{{ serverError() }}</app-alert>
+        }
+
+        <app-text-input
+          label="Nombre de la clínica"
+          autocomplete="organization"
+          [formField]="signupForm.clinicName"
+          [errorText]="clinicNameErrorText()"
+        />
+
+        <app-text-input
+          label="Nombre completo"
+          autocomplete="name"
+          [formField]="signupForm.fullName"
+          [errorText]="fullNameErrorText()"
+        />
+
+        <app-text-input
+          label="Correo electrónico"
+          type="email"
+          autocomplete="email"
+          [formField]="signupForm.email"
+          [errorText]="emailErrorText()"
+        />
+
+        <app-text-input
+          label="Contraseña"
+          type="password"
+          autocomplete="new-password"
+          helperText="Mínimo 8 caracteres, no puede ser solo números."
+          [formField]="signupForm.password"
+          [errorText]="passwordErrorText()"
+        />
+
+        <app-button type="submit" [loading]="submitting()" [disabled]="submitting()">
+          Crear cuenta
+        </app-button>
+
+        <p class="text-center text-sm text-ink-muted">
+          ¿Ya tienes una cuenta?
+          <a routerLink="/login" class="font-medium text-primary hover:underline">Inicia sesión</a>
+        </p>
+      </form>
+    </app-card>
+  </div>
+</div>

@@ -5,6 +5,7 @@
   <div class="relative flex items-center">
     <ng-content select="[iconStart]" />
     <input
+      #inputEl
       [id]="fieldId"
       [type]="type()"
       [value]="value()"

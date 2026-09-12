@@ -1,0 +1,15 @@
+<div class="min-h-svh bg-surface-muted">
+  <app-topbar
+    [userName]="user()?.fullName ?? ''"
+    [userSubtitle]="roleLabel()"
+    [userInitials]="userInitials()"
+    [planLabel]="planLabel()"
+  />
+
+  <main class="mx-auto max-w-3xl px-4 py-10">
+    <app-card padding="lg">
+      <h1 class="font-heading text-xl font-semibold text-ink">Bienvenido, {{ user()?.fullName }}</h1>
+      <p class="mt-2 text-sm text-ink-muted">Has iniciado sesión correctamente.</p>
+    </app-card>
+  </main>
+</div>

@@ -1,4 +1,4 @@
-import { Component, computed, input, model } from '@angular/core';
+import { Component, ElementRef, computed, input, model, viewChild } from '@angular/core';
 import { getFormFieldClasses } from '../../utils/form-field-classes.util';
 
 export type TextInputType = 'text' | 'email' | 'tel' | 'search' | 'password' | 'date';
@@ -27,6 +27,13 @@ export class TextInput {
 
   protected fieldId = `text-input-${nextId++}`;
   protected descriptionId = `${this.fieldId}-description`;
+
+  private readonly inputRef = viewChild.required<ElementRef<HTMLInputElement>>('inputEl');
+
+  /** Lets Signal Forms move focus here (e.g. to the first invalid field on submit). */
+  focus(options?: FocusOptions): void {
+    this.inputRef().nativeElement.focus(options);
+  }
 
   protected hasError = computed(() => !!this.errorText());
   protected description = computed(() => this.errorText() ?? this.helperText());

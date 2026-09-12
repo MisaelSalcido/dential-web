@@ -1,0 +1,11 @@
+<div class="flex h-full w-[232px] flex-col border-r border-line bg-surface p-3.5">
+  <div class="mb-4">
+    <ng-content select="[sidebar-logo]" />
+  </div>
+  <nav class="flex-1 overflow-y-auto">
+    <ng-content select="[sidebar-nav]" />
+  </nav>
+  <div class="mt-auto pt-3.5">
+    <ng-content select="[sidebar-footer]" />
+  </div>
+</div>

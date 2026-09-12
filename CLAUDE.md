@@ -1,5 +1,62 @@
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
+## Project
+
+Dential Web is a multi-tenant clinical record management system for dental clinics. Core domains:
+
+- Clinical records: historia clínica, notas de evolución, odontograma, consentimiento
+- Appointment scheduling and treatment plans
+- Document/image storage
+- Patient identity validation (CURP/RENAPO)
+- Clinical note signing
+- Multi-tenant clinic management
+- Subscription/billing feature-gating
+- Audit logging and data retention
+
+**Product language:** Spanish (UI/UX copy, user-facing strings). **Engineering language:** English (code, comments, docs, this file).
+
+## Folder Structure
+
+- `public`: Public assets
+- `src/environments`: Environment files
+- `src/app`
+  - `components`: Individual components
+  - `pages`: Navigation-routed components
+  - `utils`: Util files
+  - `models`: Models for objects
+  - `services`
+    - `api`: HTTP API specific services
+    - `local`: App services (notifications, popups, auth, etc.)
+  - `directives`: Custom Angular directives
+  - `guards`: Angular guards
+  - `decorators`: Custom Angular decorators
+  - `pipes`: Custom Angular pipes
+
+## Security
+
+- Use Angular guards to guard user-specific routes
+- Treat clinical and patient identity data (CURP/RENAPO, historia clínica, consentimiento) as sensitive; never log it
+- Respect multi-tenant boundaries — never let client code assume a single tenant/clinic context
+- Enforce subscription/billing feature-gating checks before rendering or enabling gated features
+- Preserve audit logging hooks for actions that must be traceable (clinical note signing, record edits, deletions)
+
+## Code Structure
+
+- Always create components with files for HTML, CSS, TS, and spec testing, even if CSS is mostly unused
+- For page components (components connected to a route), create the component under `src/app/pages` following the same route path as the Angular route (e.g., `/home` -> `src/app/pages/home`)
+- Always prefer signals over observables/promises
+- For promises, always use async/await; don't create callbacks
+- For table queries or calls that fetch multiple objects with filters from the API, use `httpResource` with debounce to avoid flooding the API
+- Always use Tailwind CSS classes rather than custom CSS
+- Always design mobile-first
+- If an HTML file is too big (500+ lines), break it into components
+- Use async pipes in the HTML when using observables/promises
+- Use `@if`/`@else`/`@for`/`@switch` instead of legacy star directives (`*ngIf`, etc.)
+- Explicit RxJS cleanup (unsubscribe, `takeUntilDestroyed`, etc.)
+- Always use `input()` and `output()` signals for components
+- Always create unit tests for new functionality
+- Feel free to ask if something is missing or unclear
+
 ## TypeScript Best Practices
 
 - Use strict type checking

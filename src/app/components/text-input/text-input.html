@@ -1,0 +1,28 @@
+<div class="w-full">
+  <label [for]="fieldId" class="mb-1.5 block text-xs font-medium text-ink-muted" [class.sr-only]="hideLabel()">
+    {{ label() }}
+  </label>
+  <div class="relative flex items-center">
+    <ng-content select="[iconStart]" />
+    <input
+      [id]="fieldId"
+      [type]="type()"
+      [value]="value()"
+      [placeholder]="placeholder()"
+      [disabled]="disabled()"
+      [readonly]="readonly()"
+      [required]="required()"
+      [autocomplete]="autocomplete() ?? undefined"
+      [attr.aria-invalid]="hasError() || null"
+      [attr.aria-describedby]="description() ? descriptionId : null"
+      [class]="inputClasses()"
+      (input)="onInput($event)"
+    />
+    <ng-content select="[iconEnd]" />
+  </div>
+  @if (description()) {
+    <p [id]="descriptionId" class="mt-1.5 text-xs" [class]="descriptionColorClass()">
+      {{ description() }}
+    </p>
+  }
+</div>

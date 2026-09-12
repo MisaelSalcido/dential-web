@@ -1,0 +1,30 @@
+<div
+  role="tablist"
+  [attr.aria-label]="ariaLabel()"
+  class="flex gap-6 border-b border-line"
+  (keydown)="onKeydown($event)"
+>
+  @for (tab of tabs(); track tab.id; let i = $index) {
+    <button
+      #tabBtn
+      type="button"
+      role="tab"
+      [id]="tabId(tab)"
+      [attr.aria-selected]="activeTab() === tab.id"
+      [attr.aria-controls]="panelId(tab)"
+      [tabindex]="tabIndexFor(tab, i)"
+      [disabled]="tab.locked ?? false"
+      class="flex items-center gap-1.5 border-b-2 py-3 font-heading text-[15.5px]"
+      [class]="tabClasses(tab)"
+      (click)="select(tab)"
+    >
+      {{ tab.label }}
+      @if (tab.locked) {
+        <svg class="size-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8" />
+          <path d="M8 11V7a4 4 0 018 0v4" stroke="currentColor" stroke-width="1.8" />
+        </svg>
+      }
+    </button>
+  }
+</div>

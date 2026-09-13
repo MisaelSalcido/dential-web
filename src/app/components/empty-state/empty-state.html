@@ -1,0 +1,12 @@
+<div
+  class="flex flex-col items-center gap-2.5 rounded-lg border border-dashed border-line-muted bg-surface-muted p-6 text-center"
+>
+  <span class="text-ink-subtle">
+    <ng-content select="[icon]" />
+  </span>
+  <p class="font-heading text-sm font-medium text-ink">{{ title() }}</p>
+  <p class="text-xs text-ink-muted">{{ description() }}</p>
+  @if (hint()) {
+    <p class="text-xs text-ink-subtle">{{ hint() }}</p>
+  }
+</div>

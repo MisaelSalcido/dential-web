@@ -1,4 +1,7 @@
-<div class="flex h-full w-[232px] flex-col border-r border-line bg-surface p-3.5">
+<div
+  class="flex h-full flex-col border-r border-line bg-surface p-3.5"
+  [class]="collapsed() ? 'w-[72px]' : 'w-[232px]'"
+>
   <div class="mb-4">
     <ng-content select="[sidebar-logo]" />
   </div>
@@ -7,5 +10,23 @@
   </nav>
   <div class="mt-auto pt-3.5">
     <ng-content select="[sidebar-footer]" />
+  </div>
+  <div class="mt-2 border-t border-line pt-2">
+    <button
+      type="button"
+      class="flex w-full items-center justify-center rounded-md p-2 text-ink-muted hover:bg-surface-muted hover:text-ink"
+      [attr.aria-label]="collapsed() ? 'Expandir barra lateral' : 'Colapsar barra lateral'"
+      (click)="toggled.emit()"
+    >
+      <svg
+        class="size-4 shrink-0"
+        [class]="collapsed() ? 'rotate-180' : ''"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
   </div>
 </div>

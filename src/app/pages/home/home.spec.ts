@@ -1,30 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
-import { AuthService } from '../../services/local/auth.service';
 import { Home } from './home';
 
 describe('Home', () => {
   let fixture: ComponentFixture<Home>;
+  let router: Router;
 
   beforeEach(async () => {
-    const authService = {
-      currentUser: () => ({
-        id: '1',
-        fullName: 'Dra. Ana López',
-        email: 'ana@example.com',
-        role: 'ADMIN' as const,
-        tenant: { id: 't1', name: 'Consultorio Demo', subscriptionPlan: 'FREE' },
-      }),
-      logout: vi.fn().mockResolvedValue(undefined),
-    };
-
     await TestBed.configureTestingModule({
       imports: [Home],
-      providers: [{ provide: AuthService, useValue: authService }, provideRouter([])],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Home);
+    router = TestBed.inject(Router);
+    vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     fixture.detectChanges();
   });
 
@@ -32,18 +23,42 @@ describe('Home', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should welcome the signed-in user by name', () => {
-    expect(fixture.nativeElement.textContent).toContain('Dra. Ana López');
-  });
-
-  it('should show the plan badge and role subtitle in the topbar', () => {
+  it('should show the today\'s-appointments empty state', () => {
     const text = fixture.nativeElement.textContent;
-    expect(text).toContain('Plan FREE');
-    expect(text).toContain('Administrador');
+    expect(text).toContain('Sin citas para hoy');
   });
 
-  it('should render the topbar logout action', () => {
+  it('should show acciones rápidas with a new-patient and a search-patient action', () => {
     const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('button'));
-    expect(buttons.some((button) => button.textContent?.includes('Cerrar sesión'))).toBe(true);
+    expect(buttons.some((button) => button.textContent?.includes('Nuevo paciente'))).toBe(true);
+    expect(buttons.some((button) => button.textContent?.includes('Buscar paciente'))).toBe(true);
+  });
+
+  it('should navigate to /pacientes when a quick action is clicked', () => {
+    const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('button'));
+    const newPatientButton = buttons.find((button) => button.textContent?.includes('Nuevo paciente'));
+
+    newPatientButton!.click();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/pacientes');
+  });
+
+  it('should show the notas-pendientes empty state', () => {
+    expect(fixture.nativeElement.textContent).toContain('Sin notas pendientes');
+  });
+
+  it('should show the radiografías-y-fotos empty state with no paid-plan lock wording', () => {
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('Sin radiografías ni fotos');
+    expect(text).not.toContain('plan de pago');
+  });
+
+  it('should render all three empty-state messages with distinct wording', () => {
+    const text = fixture.nativeElement.textContent;
+    const titles = ['Sin citas para hoy', 'Sin notas pendientes', 'Sin radiografías ni fotos'];
+    expect(new Set(titles).size).toBe(titles.length);
+    for (const title of titles) {
+      expect(text).toContain(title);
+    }
   });
 });

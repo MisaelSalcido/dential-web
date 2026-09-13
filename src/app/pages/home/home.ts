@@ -1,44 +1,26 @@
-import { Component, computed, inject } from '@angular/core';
-import { Card } from '../../components/card/card';
-import { Topbar } from '../../components/topbar/topbar';
-import { Role } from '../../models/auth-user.model';
-import { AuthService } from '../../services/local/auth.service';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { Button } from '../../components/button/button';
+import { EmptyState } from '../../components/empty-state/empty-state';
+import { QuickAction } from '../../models/quick-action.model';
 
-const ROLE_LABELS: Record<Role, string> = {
-  PLATFORM_ADMIN: 'Administrador de la plataforma',
-  ADMIN: 'Administrador',
-  DENTIST: 'Odontólogo/a',
-  ASSISTANT: 'Asistente',
-};
+const QUICK_ACTIONS: QuickAction[] = [
+  { key: 'new-patient', label: '＋ Nuevo paciente', variant: 'primary', targetPath: '/pacientes' },
+  { key: 'search-patient', label: 'Buscar paciente', variant: 'secondary', targetPath: '/pacientes' },
+];
 
 @Component({
   selector: 'app-home',
-  imports: [Card, Topbar],
+  imports: [Button, EmptyState],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home {
-  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  protected readonly user = this.authService.currentUser;
+  protected readonly quickActions = QUICK_ACTIONS;
 
-  protected readonly userInitials = computed(() => {
-    const name = this.user()?.fullName ?? '';
-    return name
-      .split(' ')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join('');
-  });
-
-  protected readonly roleLabel = computed(() => {
-    const role = this.user()?.role;
-    return role ? ROLE_LABELS[role] : null;
-  });
-
-  protected readonly planLabel = computed(() => {
-    const plan = this.user()?.tenant?.subscriptionPlan;
-    return plan ? `Plan ${plan}` : null;
-  });
+  protected navigateTo(path: string): void {
+    this.router.navigateByUrl(path);
+  }
 }

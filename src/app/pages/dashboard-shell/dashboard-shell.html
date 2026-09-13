@@ -1,0 +1,112 @@
+<div class="flex h-svh bg-surface-muted">
+  <app-sidebar [collapsed]="sidebarState.collapsed()" (toggled)="sidebarState.toggle()">
+    <div sidebar-logo class="flex items-center gap-2.5 px-1.5">
+      <span class="grid size-[30px] shrink-0 place-items-center rounded-md bg-primary text-white">
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M12 21c-.9 0-1.2-1-1.4-2.4-.2-1.5-.4-2.6-1.6-2.6s-1.6 1.6-2.4 1.6C5.3 17.6 5 15 5 12.4 5 7.5 7.6 4 12 4s7 3.5 7 8.4c0 2.6-.3 5.2-1.6 5.2-.8 0-1.2-1.6-2.4-1.6s-1.4 1.1-1.6 2.6C13.2 20 12.9 21 12 21Z"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+        </svg>
+      </span>
+      @if (!sidebarState.collapsed()) {
+        <span class="font-heading text-lg text-ink">Dential</span>
+      }
+    </div>
+
+    <div sidebar-nav class="flex flex-col gap-0.5">
+      @for (link of navLinks; track link.key) {
+        <app-nav-item
+          [label]="link.label"
+          [routerLink]="navLinkPath(link)"
+          [exact]="link.path === ''"
+          [collapsed]="sidebarState.collapsed()"
+        >
+          <svg icon class="size-[18px] shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            @switch (link.key) {
+              @case ('home') {
+                <path
+                  d="M3 10.5 12 3l9 7.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M5 9.5V21h14V9.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              }
+              @case ('pacientes') {
+                <path
+                  d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 21v-2a4 4 0 0 0-3-3.87"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              }
+              @case ('agenda') {
+                <path d="M4 6h16v15H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                <path d="M8 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M4 11h16" stroke="currentColor" stroke-width="1.8" />
+              }
+              @case ('documentos') {
+                <path d="M6 3h8l4 4v14H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                <path d="M14 3v4h4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                <path d="M9 12h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M9 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              }
+              @case ('ajustes') {
+                <path
+                  d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <path
+                  d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              }
+            }
+          </svg>
+        </app-nav-item>
+      }
+    </div>
+  </app-sidebar>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <app-topbar
+      [userName]="user()?.fullName ?? ''"
+      [userSubtitle]="roleLabel()"
+      [userInitials]="userInitials()"
+      [planLabel]="planLabel()"
+    >
+      <app-search-field topbar-search placeholder="Nombre, teléfono o folio…" [kbdHint]="null" />
+    </app-topbar>
+    <main class="flex-1 overflow-y-auto">
+      <router-outlet />
+    </main>
+  </div>
+</div>

@@ -1,15 +1,73 @@
-<div class="min-h-svh bg-surface-muted">
-  <app-topbar
-    [userName]="user()?.fullName ?? ''"
-    [userSubtitle]="roleLabel()"
-    [userInitials]="userInitials()"
-    [planLabel]="planLabel()"
-  />
+<div class="mx-auto max-w-6xl p-6">
+  <h1 class="font-heading text-xl font-semibold text-ink">Inicio</h1>
 
-  <main class="mx-auto max-w-3xl px-4 py-10">
-    <app-card padding="lg">
-      <h1 class="font-heading text-xl font-semibold text-ink">Bienvenido, {{ user()?.fullName }}</h1>
-      <p class="mt-2 text-sm text-ink-muted">Has iniciado sesión correctamente.</p>
-    </app-card>
-  </main>
+  <div class="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
+    <section aria-labelledby="today-appointments-heading">
+      <h2 id="today-appointments-heading" class="mb-3 text-xs font-medium tracking-wide text-ink-muted uppercase">
+        Citas de hoy
+      </h2>
+      <app-empty-state
+        title="Sin citas para hoy"
+        description="Aún no hay una agenda conectada. Cuando esté disponible, verás aquí las citas del día."
+      >
+        <svg icon class="size-8" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 6h16v15H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          <path d="M8 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M4 11h16" stroke="currentColor" stroke-width="1.8" />
+        </svg>
+      </app-empty-state>
+    </section>
+
+    <div class="flex flex-col gap-5">
+      <section aria-labelledby="quick-actions-heading" class="rounded-lg border border-line bg-surface p-5 shadow-card">
+        <h2 id="quick-actions-heading" class="mb-3 text-xs font-medium tracking-wide text-ink-muted uppercase">
+          Acciones rápidas
+        </h2>
+        <div class="flex flex-col gap-2.5">
+          @for (action of quickActions; track action.key) {
+            <app-button [variant]="action.variant" (click)="navigateTo(action.targetPath)">
+              {{ action.label }}
+            </app-button>
+          }
+        </div>
+      </section>
+
+      <section aria-labelledby="pending-notes-heading">
+        <h2 id="pending-notes-heading" class="mb-3 text-xs font-medium tracking-wide text-ink-muted uppercase">
+          Notas pendientes
+        </h2>
+        <app-empty-state
+          title="Sin notas pendientes"
+          description="Aún no hay notas clínicas conectadas. Cuando esté disponible, verás aquí las que esperan tu firma."
+        >
+          <svg icon class="size-8" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 20h4L20 8l-4-4L4 16z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          </svg>
+        </app-empty-state>
+      </section>
+
+      <section aria-labelledby="radiographs-heading">
+        <h2 id="radiographs-heading" class="mb-3 text-xs font-medium tracking-wide text-ink-muted uppercase">
+          Radiografías y fotos
+        </h2>
+        <app-empty-state
+          title="Sin radiografías ni fotos"
+          description="Adjuntar imágenes al expediente aún no está disponible."
+        >
+          <svg icon class="size-8" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 5h16v14H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path
+              d="M4 16l5-5 4 4 3-3 4 4"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="9" cy="9" r="1" fill="currentColor" />
+          </svg>
+        </app-empty-state>
+      </section>
+    </div>
+  </div>
 </div>

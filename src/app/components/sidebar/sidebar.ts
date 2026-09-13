@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 /**
  * Pure layout shell — no navigation data or routing knowledge. Consumers project
@@ -9,4 +9,7 @@ import { Component } from '@angular/core';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
-export class Sidebar {}
+export class Sidebar {
+  collapsed = input<boolean>(false);
+  toggled = output<void>();
+}

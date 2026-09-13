@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Sidebar } from './sidebar';
 
@@ -6,14 +6,17 @@ import { Sidebar } from './sidebar';
   selector: 'app-sidebar-host',
   imports: [Sidebar],
   template: `
-    <app-sidebar>
+    <app-sidebar [collapsed]="collapsed()" (toggled)="toggleCount = toggleCount + 1">
       <span sidebar-logo>Dential</span>
       <a sidebar-nav href="#">Pacientes</a>
       <button sidebar-footer type="button">Ver planes</button>
     </app-sidebar>
   `,
 })
-class SidebarHost {}
+class SidebarHost {
+  collapsed = signal(false);
+  toggleCount = 0;
+}
 
 describe('Sidebar', () => {
   let fixture: ComponentFixture<SidebarHost>;
@@ -40,5 +43,23 @@ describe('Sidebar', () => {
 
   it('should wrap projected nav content in a nav landmark', () => {
     expect(fixture.nativeElement.querySelector('nav a')).toBeTruthy();
+  });
+
+  it('should render expanded width by default', () => {
+    const root: HTMLElement = fixture.nativeElement.querySelector('div');
+    expect(root.className).toContain('w-[232px]');
+  });
+
+  it('should switch to a compact width when collapsed', () => {
+    fixture.componentInstance.collapsed.set(true);
+    fixture.detectChanges();
+    const root: HTMLElement = fixture.nativeElement.querySelector('div');
+    expect(root.className).toContain('w-[72px]');
+  });
+
+  it('should emit toggled when the collapse control is clicked', () => {
+    const toggleButton: HTMLButtonElement = fixture.nativeElement.querySelector('button[aria-label]');
+    toggleButton.click();
+    expect(fixture.componentInstance.toggleCount).toBe(1);
   });
 });

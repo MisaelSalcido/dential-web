@@ -12,7 +12,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       routerLinkActive
       #rla="routerLinkActive"
       [routerLinkActiveOptions]="{ exact: exact() }"
-      class="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm"
+      class="flex h-10 items-center gap-2.5 rounded-md px-3 text-sm"
       [class]="classes(rla.isActive)"
       [attr.aria-current]="rla.isActive ? 'page' : null"
       [attr.aria-disabled]="locked() ? 'true' : null"
@@ -20,9 +20,11 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       [attr.title]="collapsed() ? label() : null"
     >
       <ng-content select="[icon]" />
-      @if (!collapsed()) {
-        <span class="flex-1 truncate">{{ label() }}</span>
-      }
+      <span
+        class="flex-1 overflow-hidden whitespace-nowrap truncate transition-[max-width,opacity] duration-300 ease-in-out"
+        [class]="collapsed() ? 'max-w-0 opacity-0' : 'max-w-[160px] opacity-100'"
+        >{{ label() }}</span
+      >
       @if (locked()) {
         <svg class="size-3.5 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8" />

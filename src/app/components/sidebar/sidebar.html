@@ -1,5 +1,5 @@
 <div
-  class="flex h-full flex-col border-r border-line bg-surface p-3.5"
+  class="flex h-full flex-col overflow-hidden border-r border-line bg-surface p-3.5 transition-[width] duration-300 ease-in-out"
   [class]="collapsed() ? 'w-[72px]' : 'w-[232px]'"
 >
   <div class="mb-4">
@@ -19,7 +19,7 @@
       (click)="toggled.emit()"
     >
       <svg
-        class="size-4 shrink-0"
+        class="size-4 shrink-0 transition-transform duration-300 ease-in-out"
         [class]="collapsed() ? 'rotate-180' : ''"
         viewBox="0 0 24 24"
         fill="none"

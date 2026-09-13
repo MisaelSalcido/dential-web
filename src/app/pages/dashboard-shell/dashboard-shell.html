@@ -10,9 +10,11 @@
           />
         </svg>
       </span>
-      @if (!sidebarState.collapsed()) {
-        <span class="font-heading text-lg text-ink">Dential</span>
-      }
+      <span
+        class="overflow-hidden whitespace-nowrap font-heading text-lg text-ink transition-[max-width,opacity] duration-300 ease-in-out"
+        [class]="sidebarState.collapsed() ? 'max-w-0 opacity-0' : 'max-w-[140px] opacity-100'"
+        >Dential</span
+      >
     </div>
 
     <div sidebar-nav class="flex flex-col gap-0.5">
@@ -103,7 +105,7 @@
       [userInitials]="userInitials()"
       [planLabel]="planLabel()"
     >
-      <app-search-field topbar-search placeholder="Nombre, teléfono o folio…" [kbdHint]="null" />
+      <app-search-field topbar-search placeholder="Busca paciente por nombre, teléfono o folio…" [kbdHint]="null" />
     </app-topbar>
     <main class="flex-1 overflow-y-auto">
       <router-outlet />

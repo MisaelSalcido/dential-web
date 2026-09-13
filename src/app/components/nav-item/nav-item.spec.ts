@@ -81,10 +81,22 @@ describe('NavItem', () => {
     expect(fixture.nativeElement.querySelector('svg')).toBeTruthy();
   });
 
-  it('should hide the visible label but keep an accessible name when collapsed', () => {
+  it('should visually collapse the label but keep an accessible name when collapsed', () => {
     fixture.componentInstance.collapsed = true;
     fixture.detectChanges();
-    expect(link().textContent?.trim()).toBe('');
+    const label = link().querySelector('span');
+    expect(label?.className).toContain('max-w-0');
+    expect(label?.className).toContain('opacity-0');
     expect(link().getAttribute('aria-label')).toBe('Pacientes');
+  });
+
+  it('should keep the row height the same when collapsed and expanded', () => {
+    fixture.detectChanges();
+    const expandedClasses = link().className;
+    fixture.componentInstance.collapsed = true;
+    fixture.detectChanges();
+    const collapsedClasses = link().className;
+    expect(expandedClasses).toContain('h-10');
+    expect(collapsedClasses).toContain('h-10');
   });
 });

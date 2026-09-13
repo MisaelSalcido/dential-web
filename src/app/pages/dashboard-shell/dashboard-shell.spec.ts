@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 import { AuthService } from '../../services/local/auth.service';
+import { HotkeyService } from '../../services/local/hotkey.service';
 import { DashboardShell } from './dashboard-shell';
 
 @Component({ selector: 'app-route-stub', template: 'stub' })
@@ -53,6 +54,12 @@ describe('DashboardShell', () => {
     return Array.from(fixture.nativeElement.querySelectorAll('nav a'));
   }
 
+  function dispatchKeydown(init: KeyboardEventInit): KeyboardEvent {
+    const event = new KeyboardEvent('keydown', { cancelable: true, ...init });
+    document.dispatchEvent(event);
+    return event;
+  }
+
   it('should create', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
@@ -88,10 +95,93 @@ describe('DashboardShell', () => {
   });
 
   it('should toggle the sidebar collapsed state when the collapse control is clicked', () => {
-    const toggleButton: HTMLButtonElement = fixture.nativeElement.querySelector('button[aria-label]');
+    const toggleButton: HTMLButtonElement =
+      fixture.nativeElement.querySelector('button[aria-label]');
     toggleButton.click();
     fixture.detectChanges();
 
     expect(navLinks()[0].getAttribute('aria-label')).toBe('Inicio');
+  });
+
+  describe('navigation hotkeys', () => {
+    const cases: Array<[label: string, code: string, expectedUrl: string]> = [
+      ['Inicio', 'Digit1', '/'],
+      ['Pacientes', 'Digit2', '/pacientes'],
+      ['Agenda', 'Digit3', '/agenda'],
+      ['Documentos', 'Digit4', '/documentos'],
+      ['Ajustes', 'Digit5', '/ajustes'],
+    ];
+
+    it.each(cases)('should navigate to %s on Ctrl+%s', async (_label, code, expectedUrl) => {
+      const navigateSpy = vi.spyOn(router, 'navigate');
+      dispatchKeydown({ ctrlKey: true, code });
+      await navigateSpy.mock.results[0].value;
+      await flushMicrotasks();
+      fixture.detectChanges();
+
+      expect(router.url).toBe(expectedUrl);
+    });
+
+    it('should stay on the current page without error when its own hotkey is pressed again', async () => {
+      await router.navigateByUrl('/pacientes');
+      await flushMicrotasks();
+      fixture.detectChanges();
+
+      const navigateSpy = vi.spyOn(router, 'navigate');
+      dispatchKeydown({ ctrlKey: true, code: 'Digit2' });
+      await navigateSpy.mock.results[0].value;
+      await flushMicrotasks();
+      fixture.detectChanges();
+
+      expect(router.url).toBe('/pacientes');
+    });
+
+    it('should do nothing for an unassigned combo', () => {
+      expect(() => dispatchKeydown({ ctrlKey: true, code: 'Digit6' })).not.toThrow();
+      expect(router.url).toBe('/');
+    });
+  });
+
+  describe('search-focus hotkey', () => {
+    function searchInput(): HTMLInputElement {
+      return fixture.nativeElement.querySelector('[topbar-search] input');
+    }
+
+    it('should move focus into the patient search field on Ctrl+Space', () => {
+      dispatchKeydown({ ctrlKey: true, code: 'Space' });
+      expect(document.activeElement).toBe(searchInput());
+    });
+
+    it('should move focus into the patient search field even when another element was focused', () => {
+      const toggleButton: HTMLButtonElement =
+        fixture.nativeElement.querySelector('button[aria-label]');
+      toggleButton.focus();
+      expect(document.activeElement).toBe(toggleButton);
+
+      dispatchKeydown({ ctrlKey: true, code: 'Space' });
+      expect(document.activeElement).toBe(searchInput());
+    });
+  });
+
+  describe('extensibility', () => {
+    it('should leave all 6 built-in hotkeys working after a new one is registered', async () => {
+      const extraHandler = vi.fn();
+      TestBed.inject(HotkeyService).register('ctrl+Digit6', extraHandler);
+
+      dispatchKeydown({ ctrlKey: true, code: 'Digit6' });
+      expect(extraHandler).toHaveBeenCalledOnce();
+
+      const navigateSpy = vi.spyOn(router, 'navigate');
+      dispatchKeydown({ ctrlKey: true, code: 'Digit2' });
+      await navigateSpy.mock.results[0].value;
+      await flushMicrotasks();
+      fixture.detectChanges();
+      expect(router.url).toBe('/pacientes');
+
+      dispatchKeydown({ ctrlKey: true, code: 'Space' });
+      const searchInput: HTMLInputElement =
+        fixture.nativeElement.querySelector('[topbar-search] input');
+      expect(document.activeElement).toBe(searchInput);
+    });
   });
 });

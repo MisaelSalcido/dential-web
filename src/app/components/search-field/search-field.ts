@@ -1,4 +1,4 @@
-import { Component, computed, input, model, signal } from '@angular/core';
+import { Component, ElementRef, computed, input, model, signal, viewChild } from '@angular/core';
 
 @Component({
   selector: 'app-search-field',
@@ -11,10 +11,17 @@ export class SearchField {
   placeholder = input<string>('Buscar...');
   kbdHint = input<string | null>('⌘K');
 
+  private readonly inputRef = viewChild.required<ElementRef<HTMLInputElement>>('input');
   private focused = signal(false);
 
+  focusInput(): void {
+    this.inputRef().nativeElement.focus();
+  }
+
   protected containerClasses = computed(() =>
-    this.focused() ? 'border-primary bg-surface ring-4 ring-primary/12' : 'border-line-strong bg-surface-muted',
+    this.focused()
+      ? 'border-primary bg-surface ring-4 ring-primary/12'
+      : 'border-line-strong bg-surface-muted',
   );
 
   protected onInput(event: Event): void {

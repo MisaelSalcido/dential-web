@@ -1,10 +1,14 @@
 <div class="relative w-full">
-  <div class="flex min-h-11 items-center gap-2 rounded-md border px-3.5" [class]="containerClasses()">
+  <div
+    class="flex min-h-11 items-center gap-2 rounded-md border px-3.5"
+    [class]="containerClasses()"
+  >
     <svg class="size-4 shrink-0 text-ink-muted" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
       <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
     </svg>
     <input
+      #input
       type="search"
       class="min-w-0 flex-1 bg-transparent text-sm text-ink placeholder:text-ink-muted focus:outline-none"
       [placeholder]="placeholder()"
@@ -14,7 +18,9 @@
       (blur)="onBlur()"
     />
     @if (kbdHint()) {
-      <span class="shrink-0 rounded-[5px] border border-line px-1.5 py-0.5 text-[11.5px] text-ink-muted">
+      <span
+        class="shrink-0 rounded-[5px] border border-line px-1.5 py-0.5 text-[11.5px] text-ink-muted"
+      >
         {{ kbdHint() }}
       </span>
     }

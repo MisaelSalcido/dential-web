@@ -48,4 +48,11 @@ describe('SearchField', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('⌘K');
   });
+
+  it('should move DOM focus onto the native input when focusInput() is called', () => {
+    fixture.detectChanges();
+    fixture.componentInstance.focusInput();
+
+    expect(document.activeElement).toBe(nativeInput());
+  });
 });

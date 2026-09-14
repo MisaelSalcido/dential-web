@@ -24,7 +24,7 @@
         </h2>
         <div class="flex flex-col gap-2.5">
           @for (action of quickActions; track action.key) {
-            <app-button [variant]="action.variant" (click)="navigateTo(action.targetPath)">
+            <app-button [variant]="action.variant" (click)="handleQuickAction(action)">
               {{ action.label }}
             </app-button>
           }

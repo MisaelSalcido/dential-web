@@ -1,4 +1,50 @@
 <div class="p-6">
-  <h1 class="font-heading text-xl font-semibold text-ink">Pacientes</h1>
-  <p class="mt-2 text-sm text-ink-muted">Esta sección está en construcción.</p>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="font-heading text-xl font-semibold text-ink">Pacientes</h1>
+    <app-button (click)="openCreateModal()" testId="patients-new-button">＋ Nuevo paciente</app-button>
+  </div>
+
+  <div class="mt-4 max-w-md">
+    <app-search-field
+      placeholder="Busca por nombre, teléfono o folio…"
+      ariaLabel="Buscar paciente por nombre, teléfono o folio"
+      [kbdHint]="null"
+      [(value)]="query"
+    />
+  </div>
+
+  <div class="mt-5">
+    @if (query().trim().length === 0) {
+      <app-empty-state
+        title="Busca un paciente"
+        description="Escribe un nombre, teléfono o folio para encontrar un expediente existente."
+      />
+    } @else if (searchResource.isLoading()) {
+      <p class="text-sm text-ink-muted">Buscando…</p>
+    } @else if (searchResource.value()?.length) {
+      <div class="flex flex-col gap-2">
+        @for (result of searchResource.value(); track result.id) {
+          <app-card>
+            <a [routerLink]="['/pacientes', result.id]" class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="font-medium text-ink">{{ result.fullName }}</p>
+                <p class="text-sm text-ink-muted">Folio {{ result.folio }} · {{ result.edad }} años · {{ result.phone }}</p>
+              </div>
+              @if (result.hasAllergies) {
+                <app-badge variant="danger">Alergias</app-badge>
+              }
+            </a>
+          </app-card>
+        }
+      </div>
+    } @else {
+      <div class="flex flex-col items-center gap-3">
+        <app-empty-state
+          title="Sin coincidencias"
+          [description]="'No encontramos pacientes que coincidan con &quot;' + query() + '&quot;.'"
+        />
+        <app-button (click)="openCreateModal()">Crear paciente con "{{ query() }}"</app-button>
+      </div>
+    }
+  </div>
 </div>

@@ -10,6 +10,14 @@ export const routes: Routes = [
     children: [
       { path: '', loadComponent: () => import('./pages/home/home').then((m) => m.Home) },
       { path: 'pacientes', loadComponent: () => import('./pages/patients/patients').then((m) => m.Patients) },
+      {
+        path: 'pacientes/:patientId',
+        loadComponent: () => import('./pages/patients/patient-detail/patient-detail').then((m) => m.PatientDetail),
+      },
+      {
+        path: 'pacientes/:patientId/historia-clinica',
+        loadComponent: () => import('./pages/historia-clinica/historia-clinica').then((m) => m.HistoriaClinica),
+      },
       { path: 'agenda', loadComponent: () => import('./pages/agenda/agenda').then((m) => m.Agenda) },
       { path: 'documentos', loadComponent: () => import('./pages/documents/documents').then((m) => m.Documents) },
       { path: 'ajustes', loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings) },

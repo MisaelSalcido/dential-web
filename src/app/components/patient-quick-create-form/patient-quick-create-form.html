@@ -1,0 +1,117 @@
+<form (submit)="handleSubmit($event)" class="flex flex-col gap-4" novalidate>
+  <div>
+    <h2 class="font-heading text-lg font-semibold text-ink">Nuevo paciente</h2>
+    <p class="mt-1 text-sm text-ink-muted">Captura los datos esenciales; el resto puede agregarse después.</p>
+  </div>
+
+  @if (serverError()) {
+    <app-alert variant="danger" testId="quick-create-server-error">{{ serverError() }}</app-alert>
+  }
+
+  @if (duplicateMatch(); as match) {
+    <app-alert variant="warning" testId="quick-create-duplicate-match">
+      <div class="flex flex-col gap-2">
+        <p>
+          Ya existe un expediente parecido: <strong>{{ match.fullName }}</strong> · Folio {{ match.folio }} ·
+          {{ match.phone }}
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <app-button type="button" variant="secondary" size="sm" (click)="openDuplicateMatch()">Abrir</app-button>
+          <app-button
+            type="button"
+            variant="ghost"
+            size="sm"
+            [loading]="submitting()"
+            [disabled]="submitting()"
+            (click)="createAnyway()"
+            testId="quick-create-duplicate-create-anyway"
+          >
+            Es otra persona, crear de todos modos
+          </app-button>
+        </div>
+      </div>
+    </app-alert>
+  }
+
+  <app-text-input
+    label="Nombre completo"
+    autocomplete="name"
+    [formField]="quickCreateForm.fullName"
+    [errorText]="fullNameErrorText()"
+    testId="quick-create-full-name"
+  />
+
+  <app-text-input
+    label="Fecha de nacimiento"
+    type="date"
+    [formField]="quickCreateForm.birthDate"
+    [errorText]="birthDateErrorText()"
+    testId="quick-create-birth-date"
+  />
+
+  <app-text-input
+    label="Teléfono"
+    type="tel"
+    autocomplete="tel"
+    [formField]="quickCreateForm.phone"
+    [errorText]="phoneErrorText()"
+    testId="quick-create-phone"
+  />
+
+  <app-collapsible-section title="Más detalles" [(expanded)]="moreDetailsExpanded">
+    <div class="flex flex-col gap-4">
+      <div class="flex items-end gap-2">
+        <div class="flex-1">
+          <app-text-input label="CURP" [formField]="quickCreateForm.curp" [errorText]="curpErrorText()" />
+        </div>
+        @if (isFreePlan()) {
+          <app-button variant="locked" size="md">Verificar RENAPO</app-button>
+        }
+      </div>
+
+      <div>
+        <span class="mb-1.5 block text-xs font-medium text-ink-muted">Sexo</span>
+        <app-segmented-control [options]="sexoOptions" [formField]="quickCreateForm.sexo" ariaLabel="Sexo" />
+      </div>
+
+      <fieldset class="flex flex-col gap-3">
+        <legend class="mb-1 text-xs font-medium tracking-wide text-ink-muted uppercase">Domicilio</legend>
+        <app-text-input label="Calle y número" [formField]="quickCreateForm.calleNumero" />
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <app-text-input label="Colonia" [formField]="quickCreateForm.colonia" />
+          <app-text-input label="Ciudad" [formField]="quickCreateForm.ciudad" />
+        </div>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <app-text-input label="Código postal" [formField]="quickCreateForm.codigoPostal" [errorText]="codigoPostalErrorText()" />
+          <div class="w-full">
+            <label for="estado-select" class="mb-1.5 block text-xs font-medium text-ink-muted">Estado</label>
+            <select
+              id="estado-select"
+              class="w-full rounded-md border border-line-strong bg-surface px-3.5 py-2.5 text-base text-ink focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/12 focus-visible:outline-none"
+              [formField]="quickCreateForm.estado"
+            >
+              <option value="">Selecciona un estado</option>
+              @for (estado of estadoOptions; track estado) {
+                <option [value]="estado">{{ estado }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <div>
+        <app-textarea label="Alergias" helperText="Deja en blanco si no aplica." [formField]="quickCreateForm.alergias" class="[&_textarea]:border-danger/40 [&_textarea]:bg-danger-surface" />
+        <div class="mt-2 flex flex-wrap gap-2">
+          @for (value of alergiaQuickAddValues; track value) {
+            <app-chip [label]="value" (selected)="addAllergyQuickValue($event)" />
+          }
+        </div>
+      </div>
+    </div>
+  </app-collapsible-section>
+
+  <div class="flex justify-end gap-2">
+    <app-button type="button" variant="secondary" [disabled]="submitting()" (click)="handleCancel()">Cancelar</app-button>
+    <app-button type="submit" [loading]="submitting()" [disabled]="submitting()" testId="quick-create-submit">Crear paciente</app-button>
+  </div>
+</form>

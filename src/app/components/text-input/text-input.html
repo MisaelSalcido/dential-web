@@ -16,13 +16,14 @@
       [autocomplete]="autocomplete() ?? undefined"
       [attr.aria-invalid]="hasError() || null"
       [attr.aria-describedby]="description() ? descriptionId : null"
+      [attr.data-testid]="testId()"
       [class]="inputClasses()"
       (input)="onInput($event)"
     />
     <ng-content select="[iconEnd]" />
   </div>
   @if (description()) {
-    <p [id]="descriptionId" class="mt-1.5 text-xs" [class]="descriptionColorClass()">
+    <p [id]="descriptionId" class="mt-1.5 text-xs" [class]="descriptionColorClass()" [attr.data-testid]="errorTestId()">
       {{ description() }}
     </p>
   }

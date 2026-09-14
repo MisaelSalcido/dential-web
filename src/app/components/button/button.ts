@@ -32,6 +32,7 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
       [type]="type()"
       [disabled]="disabled() || loading() || variant() === 'locked'"
       [attr.aria-busy]="loading() || null"
+      [attr.data-testid]="testId()"
       [class]="classes()"
     >
       @if (loading()) {
@@ -66,6 +67,7 @@ export class Button {
   disabled = input<boolean>(false);
   loading = input<boolean>(false);
   type = input<'button' | 'submit' | 'reset'>('button');
+  testId = input<string | null>(null);
 
   protected classes = computed(() => {
     const shape = this.pill() ? 'rounded-full' : 'rounded-md';

@@ -35,7 +35,12 @@ const VARIANT_ROLE: Record<AlertVariant, 'alert' | 'status'> = {
   host: { class: 'contents' },
   styleUrl: './alert.css',
   template: `
-    <div class="flex items-start gap-3 rounded-lg border p-4" [class]="containerClasses()" [attr.role]="role()">
+    <div
+      class="flex items-start gap-3 rounded-lg border p-4"
+      [class]="containerClasses()"
+      [attr.role]="role()"
+      [attr.data-testid]="testId()"
+    >
       <ng-content select="[icon]" />
       <div class="flex-1">
         @if (title()) {
@@ -52,6 +57,7 @@ const VARIANT_ROLE: Record<AlertVariant, 'alert' | 'status'> = {
 export class Alert {
   variant = input<AlertVariant>('info');
   title = input<string | null>(null);
+  testId = input<string | null>(null);
 
   protected containerClasses = computed(() => VARIANT_CONTAINER_CLASSES[this.variant()]);
   protected titleClasses = computed(() => VARIANT_TITLE_CLASSES[this.variant()]);

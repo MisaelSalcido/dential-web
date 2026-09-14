@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Button } from '../../components/button/button';
 import { EmptyState } from '../../components/empty-state/empty-state';
 import { QuickAction } from '../../models/quick-action.model';
+import { PatientCreateModalService } from '../../services/local/patient-create-modal.service';
 
 const QUICK_ACTIONS: QuickAction[] = [
   { key: 'new-patient', label: '＋ Nuevo paciente', variant: 'primary', targetPath: '/pacientes' },
@@ -17,10 +18,15 @@ const QUICK_ACTIONS: QuickAction[] = [
 })
 export class Home {
   private readonly router = inject(Router);
+  private readonly patientCreateModalService = inject(PatientCreateModalService);
 
   protected readonly quickActions = QUICK_ACTIONS;
 
-  protected navigateTo(path: string): void {
-    this.router.navigateByUrl(path);
+  protected handleQuickAction(action: QuickAction): void {
+    if (action.key === 'new-patient') {
+      this.patientCreateModalService.open();
+      return;
+    }
+    this.router.navigateByUrl(action.targetPath);
   }
 }

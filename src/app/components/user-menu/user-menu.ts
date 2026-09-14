@@ -18,6 +18,7 @@ import { AuthService } from '../../services/local/auth.service';
         [attr.aria-expanded]="open()"
         [attr.aria-label]="'Menú de cuenta de ' + userName()"
         (click)="toggle()"
+        data-testid="user-menu-trigger"
       >
         <app-avatar [initials]="userInitials()" size="sm" [ariaLabel]="userName()" />
         <span class="hidden text-left sm:block">
@@ -39,6 +40,7 @@ import { AuthService } from '../../services/local/auth.service';
             role="menuitem"
             class="block w-full cursor-pointer px-3 py-2 text-left text-sm text-ink-muted hover:bg-surface-muted hover:text-ink"
             (click)="handleLogout()"
+            data-testid="user-menu-logout"
           >
             Cerrar sesión
           </button>

@@ -1,0 +1,48 @@
+<div class="p-6">
+  @if (loadError()) {
+    <app-alert variant="danger">{{ loadError() }}</app-alert>
+  } @else if (loading()) {
+    <p class="text-sm text-ink-muted">Cargando paciente…</p>
+  } @else if (patient(); as patient) {
+    <div class="flex flex-col gap-5">
+      <app-card>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="font-heading text-xl font-semibold text-ink">{{ patient.fullName }}</h1>
+              @if (patient.alergias) {
+                <app-badge variant="danger">Alergias: {{ patient.alergias }}</app-badge>
+              }
+            </div>
+            <p class="mt-1 text-sm text-ink-muted">
+              Folio <span data-testid="patient-detail-folio">{{ patient.folio }}</span> · {{ patient.edad }} años ·
+              {{ patient.phone }}
+            </p>
+          </div>
+        </div>
+      </app-card>
+
+      <app-card ariaLabel="Pendientes">
+        <h2 class="mb-3 text-xs font-medium tracking-wide text-ink-muted uppercase">Pendiente</h2>
+        @if (!patient.hasHistoriaClinica) {
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm text-ink">Historia clínica sin iniciar.</p>
+            <app-button
+              [loading]="startingHistoriaClinica()"
+              [disabled]="startingHistoriaClinica()"
+              (click)="openHistoriaClinica()"
+              testId="patient-start-historia-clinica"
+            >
+              Iniciar historia clínica
+            </app-button>
+          </div>
+        } @else {
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm text-ink-muted">Historia clínica en curso.</p>
+            <app-button variant="secondary" (click)="openHistoriaClinica()">Ver historia clínica</app-button>
+          </div>
+        }
+      </app-card>
+    </div>
+  }
+</div>

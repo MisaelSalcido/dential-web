@@ -24,6 +24,7 @@ export class TextInput {
   readonly = input<boolean>(false);
   required = input<boolean>(false);
   autocomplete = input<string | null>(null);
+  testId = input<string | null>(null);
 
   protected fieldId = `text-input-${nextId++}`;
   protected descriptionId = `${this.fieldId}-description`;
@@ -38,6 +39,7 @@ export class TextInput {
   protected hasError = computed(() => !!this.errorText());
   protected description = computed(() => this.errorText() ?? this.helperText());
   protected descriptionColorClass = computed(() => (this.hasError() ? 'text-danger-text' : 'text-ink-muted'));
+  protected errorTestId = computed(() => (this.hasError() && this.testId() ? `${this.testId()}-error` : null));
 
   protected inputClasses = computed(() =>
     [getFormFieldClasses({ hasError: this.hasError(), warning: this.warning() }), 'min-h-11 px-3.5'].join(' '),

@@ -10,6 +10,7 @@ export class SearchField {
   value = model<string>('');
   placeholder = input<string>('Buscar...');
   kbdHint = input<string | null>('⌘K');
+  ariaLabel = input<string>('Buscar');
 
   private readonly inputRef = viewChild.required<ElementRef<HTMLInputElement>>('input');
   private focused = signal(false);

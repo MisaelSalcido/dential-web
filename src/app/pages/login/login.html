@@ -8,7 +8,7 @@
         </div>
 
         @if (serverError()) {
-          <app-alert variant="danger">{{ serverError() }}</app-alert>
+          <app-alert variant="danger" testId="login-server-error">{{ serverError() }}</app-alert>
         }
 
         <app-text-input
@@ -17,6 +17,7 @@
           autocomplete="email"
           [formField]="loginForm.email"
           [errorText]="emailErrorText()"
+          testId="login-email"
         />
 
         <app-text-input
@@ -25,9 +26,10 @@
           autocomplete="current-password"
           [formField]="loginForm.password"
           [errorText]="passwordErrorText()"
+          testId="login-password"
         />
 
-        <app-button type="submit" [loading]="submitting()" [disabled]="submitting()">
+        <app-button type="submit" [loading]="submitting()" [disabled]="submitting()" testId="login-submit">
           Iniciar sesión
         </app-button>
 

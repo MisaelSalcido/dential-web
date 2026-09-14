@@ -44,15 +44,34 @@ To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use th
 ng test
 ```
 
-## Running end-to-end tests
+## End-to-end tests
 
-For end-to-end (e2e) testing, run:
+The `e2e/` directory holds a [WebdriverIO](https://webdriver.io/) suite that drives the app in a
+real (headless by default) Chrome browser, covering new patient creation and starting a Historia
+Clínica — success and expected-error paths — for each of the three demo account tiers (free,
+paid, clinic).
+
+**Prerequisites** (the suite doesn't start these itself):
+
+- Postgres running: `docker compose -f ../dential-api/docker-compose.yml up -d`
+- The API running with demo accounts seeded: `DENTIAL_SEED_DEMO_ACCOUNTS=true ./gradlew bootRun`
+  (from `dential-api/`) — see `dential-api/.env.example` for the demo account env vars
+- This app running: `npm start`
+- Google Chrome installed locally (WebdriverIO manages a matching driver automatically)
+
+Then, from `dential-web/`:
 
 ```bash
-ng e2e
+npm run e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+This runs all scenarios and prints a per-scenario pass/fail line naming the tier and case (e.g.
+`clinic tier: rejects patient creation missing a required field`), so a failure is attributable
+to a specific tier/flow rather than just an aggregate result. Each run generates its own unique
+patient data, so it's safe to run repeatedly without resetting the database.
+
+**Debugging**: set `E2E_HEADLESS=false` to watch the suite run in a visible Chrome window instead
+of headless.
 
 ## Additional Resources
 

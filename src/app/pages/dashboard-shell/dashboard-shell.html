@@ -105,10 +105,33 @@
       [userInitials]="userInitials()"
       [planLabel]="planLabel()"
     >
-      <app-search-field topbar-search placeholder="Busca paciente por nombre, teléfono o folio…" [kbdHint]="null" />
+      <app-search-field
+        topbar-search
+        placeholder="Busca paciente por nombre, teléfono o folio…"
+        ariaLabel="Buscar paciente por nombre, teléfono o folio"
+        [kbdHint]="null"
+        [(value)]="searchQuery"
+      >
+        @if (searchQuery().trim().length > 0) {
+          <div results>
+            <app-patient-search-results
+              [results]="searchResource.value() ?? []"
+              [loading]="searchResource.isLoading()"
+              [query]="searchQuery()"
+              (resultSelected)="onSearchResultSelected()"
+            />
+          </div>
+        }
+      </app-search-field>
     </app-topbar>
     <main class="flex-1 overflow-y-auto">
       <router-outlet />
     </main>
   </div>
+
+  @if (patientCreateModalService.isOpen()) {
+    <app-modal [(open)]="patientCreateModalService.isOpen" ariaLabel="Nuevo paciente">
+      <app-patient-quick-create-form />
+    </app-modal>
+  }
 </div>

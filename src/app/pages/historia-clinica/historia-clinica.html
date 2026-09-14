@@ -1,0 +1,256 @@
+<div class="p-6">
+  @if (loadError()) {
+    <app-alert variant="danger">{{ loadError() }}</app-alert>
+  } @else if (loading()) {
+    <p class="text-sm text-ink-muted">Cargando historia clínica…</p>
+  } @else if (historiaClinica(); as hc) {
+    <div class="mx-auto flex max-w-3xl flex-col gap-5">
+      <app-card>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 class="font-heading text-xl font-semibold text-ink">Historia clínica</h1>
+            @if (patientFicha(); as ficha) {
+              <p class="mt-1 text-sm text-ink-muted">
+                @if (ficha.curp) {
+                  CURP: {{ ficha.curp }} ·
+                }
+                @if (ficha.sexo) {
+                  {{ ficha.sexo === 'FEMENINO' ? 'Femenino' : 'Masculino' }} ·
+                }
+                @if (ficha.domicilio) {
+                  {{ ficha.domicilio }}
+                }
+              </p>
+              @if (ficha.alergias) {
+                <app-badge variant="danger" class="mt-2 inline-block">Alergias: {{ ficha.alergias }}</app-badge>
+              }
+            }
+          </div>
+          <app-badge [variant]="hc.status === 'FINALIZADO' ? 'success' : 'neutral'" testId="hc-status-badge">
+            {{ hc.status === 'FINALIZADO' ? 'Finalizada' : 'Borrador' }}
+          </app-badge>
+        </div>
+
+        <div class="mt-4">
+          <div class="mb-1.5 flex items-center justify-between text-xs text-ink-muted">
+            <span>Completitud</span>
+            <span>{{ hc.overallCompletenessPercent }}%</span>
+          </div>
+          <app-progress-bar [value]="hc.overallCompletenessPercent" [max]="100" />
+        </div>
+
+        @if (hc.status === 'FINALIZADO' && hc.finalizedBy) {
+          <p class="mt-3 text-xs text-ink-muted">
+            Finalizada por {{ hc.finalizedBy.name }}
+            @if (hc.finalizedBy.cedula) {
+              (cédula {{ hc.finalizedBy.cedula }})
+            }
+            @if (hc.finalizedAt) {
+              el {{ hc.finalizedAt | date: 'medium' }}
+            }
+          </p>
+        }
+      </app-card>
+
+      @if (saveError()) {
+        <app-alert variant="danger" testId="hc-save-error">{{ saveError() }}</app-alert>
+      }
+      @if (finalizeError()) {
+        <app-alert variant="warning" testId="hc-finalize-error">
+          {{ finalizeError() }}
+          @if (incompleteSectionLabels().length) {
+            <ul class="mt-1 list-inside list-disc" data-testid="hc-incomplete-section-list">
+              @for (label of incompleteSectionLabels(); track label) {
+                <li>{{ label }}</li>
+              }
+            </ul>
+          }
+        </app-alert>
+      }
+
+      <app-collapsible-section [title]="sectionLabels.antecedentesHeredofamiliares" [expanded]="true">
+        <span badge>
+          <app-badge [variant]="hc.sectionCompleteness.antecedentesHeredofamiliares ? 'success' : 'neutral'">
+            {{ hc.sectionCompleteness.antecedentesHeredofamiliares ? 'Completo' : 'Pendiente' }}
+          </app-badge>
+        </span>
+        <app-textarea
+          label="Antecedentes heredofamiliares"
+          [hideLabel]="true"
+          helperText='Escribe "Sin antecedentes" si no aplica.'
+          [formField]="historiaClinicaForm.antecedentesHeredofamiliares"
+        />
+      </app-collapsible-section>
+
+      <app-collapsible-section [title]="sectionLabels.antecedentesPersonalesPatologicos">
+        <span badge>
+          <app-badge [variant]="hc.sectionCompleteness.antecedentesPersonalesPatologicos ? 'success' : 'neutral'">
+            {{ hc.sectionCompleteness.antecedentesPersonalesPatologicos ? 'Completo' : 'Pendiente' }}
+          </app-badge>
+        </span>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-wrap gap-2">
+            @for (option of patologicoQuickAddOptions; track option.field) {
+              <app-chip [label]="option.label" (selected)="addPatologicoQuickValue(option.field, 'Sí')" />
+            }
+          </div>
+          <div>
+            <app-textarea
+              label="Alergias"
+              helperText="Deja en blanco si no aplica."
+              [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.alergias"
+              class="[&_textarea]:border-danger/40 [&_textarea]:bg-danger-surface"
+            />
+            <div class="mt-2 flex flex-wrap gap-2">
+              @for (value of alergiaQuickAddValues; track value) {
+                <app-chip [label]="value" (selected)="addAllergyQuickValue($event)" />
+              }
+            </div>
+          </div>
+          <app-text-input label="Diabetes" [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.diabetes" />
+          <app-text-input label="Hipertensión" [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.hipertension" />
+          <app-text-input label="Cardiopatías" [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.cardiopatias" />
+          <app-text-input
+            label="Otros / sin antecedentes"
+            [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.otros"
+          />
+
+          <div>
+            <span class="mb-1.5 block text-xs font-medium text-ink-muted">Tabaquismo</span>
+            <app-segmented-control
+              [options]="niegaRefiereOptions"
+              [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.tabaquismoRefiere"
+              ariaLabel="Tabaquismo"
+            />
+            @if (historiaClinicaForm.antecedentesPersonalesPatologicos.tabaquismoRefiere().value() === 'true') {
+              <div class="mt-2">
+                <app-text-input
+                  label="Frecuencia / cantidad"
+                  [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.tabaquismoDetalle"
+                />
+              </div>
+            }
+          </div>
+
+          <div>
+            <span class="mb-1.5 block text-xs font-medium text-ink-muted">Alcohol</span>
+            <app-segmented-control
+              [options]="niegaRefiereOptions"
+              [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.alcoholRefiere"
+              ariaLabel="Alcohol"
+            />
+            @if (historiaClinicaForm.antecedentesPersonalesPatologicos.alcoholRefiere().value() === 'true') {
+              <div class="mt-2">
+                <app-text-input
+                  label="Frecuencia / cantidad"
+                  [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.alcoholDetalle"
+                />
+              </div>
+            }
+          </div>
+
+          <div>
+            <span class="mb-1.5 block text-xs font-medium text-ink-muted">Uso de sustancias</span>
+            <app-segmented-control
+              [options]="niegaRefiereOptions"
+              [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.sustanciasRefiere"
+              ariaLabel="Uso de sustancias"
+            />
+            @if (historiaClinicaForm.antecedentesPersonalesPatologicos.sustanciasRefiere().value() === 'true') {
+              <div class="mt-2">
+                <app-text-input
+                  label="Frecuencia / cantidad"
+                  [formField]="historiaClinicaForm.antecedentesPersonalesPatologicos.sustanciasDetalle"
+                />
+              </div>
+            }
+          </div>
+        </div>
+      </app-collapsible-section>
+
+      <app-collapsible-section [title]="sectionLabels.antecedentesNoPatologicos">
+        <span badge>
+          <app-badge [variant]="hc.sectionCompleteness.antecedentesNoPatologicos ? 'success' : 'neutral'">
+            {{ hc.sectionCompleteness.antecedentesNoPatologicos ? 'Completo' : 'Pendiente' }}
+          </app-badge>
+        </span>
+        <app-textarea
+          label="Antecedentes personales no patológicos"
+          [hideLabel]="true"
+          helperText='Escribe "Sin antecedentes" si no aplica.'
+          [formField]="historiaClinicaForm.antecedentesNoPatologicos"
+        />
+      </app-collapsible-section>
+
+      <app-collapsible-section [title]="sectionLabels.padecimientoActual">
+        <span badge>
+          <app-badge [variant]="hc.sectionCompleteness.padecimientoActual ? 'success' : 'neutral'">
+            {{ hc.sectionCompleteness.padecimientoActual ? 'Completo' : 'Pendiente' }}
+          </app-badge>
+        </span>
+        <div class="flex flex-col gap-4">
+          <app-text-input label="Motivo de consulta" [formField]="historiaClinicaForm.padecimientoActual.motivoConsulta" />
+          <app-textarea
+            label="Descripción del padecimiento"
+            [formField]="historiaClinicaForm.padecimientoActual.descripcionPadecimiento"
+          />
+        </div>
+      </app-collapsible-section>
+
+      <app-collapsible-section [title]="sectionLabels.interrogatorioAparatosSistemas">
+        <span badge>
+          <app-badge [variant]="hc.sectionCompleteness.interrogatorioAparatosSistemas ? 'success' : 'neutral'">
+            {{ hc.sectionCompleteness.interrogatorioAparatosSistemas ? 'Completo' : 'Pendiente' }}
+          </app-badge>
+        </span>
+        <app-textarea
+          label="Interrogatorio por aparatos y sistemas"
+          [hideLabel]="true"
+          helperText='Escribe "Sin hallazgos" si no aplica.'
+          [formField]="historiaClinicaForm.interrogatorioAparatosSistemas"
+        />
+      </app-collapsible-section>
+
+      <app-collapsible-section [title]="sectionLabels.exploracionFisica">
+        <span badge>
+          <app-badge [variant]="hc.sectionCompleteness.exploracionFisica ? 'success' : 'neutral'">
+            {{ hc.sectionCompleteness.exploracionFisica ? 'Completo' : 'Pendiente' }}
+          </app-badge>
+        </span>
+        <div class="flex flex-col gap-4">
+          <div class="grid grid-cols-2 gap-3">
+            <app-text-input label="T.A. sistólica" [formField]="historiaClinicaForm.exploracionFisica.tensionArterialSistolica" />
+            <app-text-input label="T.A. diastólica" [formField]="historiaClinicaForm.exploracionFisica.tensionArterialDiastolica" />
+            <app-text-input label="Frecuencia cardiaca" [formField]="historiaClinicaForm.exploracionFisica.frecuenciaCardiaca" />
+            <app-text-input label="Frecuencia respiratoria" [formField]="historiaClinicaForm.exploracionFisica.frecuenciaRespiratoria" />
+            <app-text-input label="Temperatura (°C)" [formField]="historiaClinicaForm.exploracionFisica.temperatura" />
+            <app-text-input label="Peso (kg)" [formField]="historiaClinicaForm.exploracionFisica.pesoKg" />
+            <app-text-input label="Talla (cm)" [formField]="historiaClinicaForm.exploracionFisica.tallaCm" />
+          </div>
+          <app-text-input
+            label="Cabeza y cuello"
+            helperText='Escribe "Sin hallazgos" si no aplica.'
+            [formField]="historiaClinicaForm.exploracionFisica.cabezaCuello"
+          />
+          <app-text-input label="ATM" helperText='Escribe "Sin hallazgos" si no aplica.' [formField]="historiaClinicaForm.exploracionFisica.atm" />
+          <app-textarea
+            label="Tejidos blandos"
+            helperText='Labios, mejillas, lengua, paladar, encía. Escribe "Sin hallazgos" si no aplica.'
+            [formField]="historiaClinicaForm.exploracionFisica.tejidosBlandos"
+          />
+        </div>
+      </app-collapsible-section>
+
+      <div class="flex flex-wrap justify-end gap-2">
+        <app-button variant="secondary" [loading]="saving()" [disabled]="saving()" (click)="saveDraft()" testId="hc-save-draft">
+          Guardar
+        </app-button>
+        @if (isDentist()) {
+          <app-button [loading]="finalizing()" [disabled]="finalizing() || isFinalizado()" (click)="finalize()" testId="hc-finalize">
+            {{ isFinalizado() ? 'Finalizada' : 'Finalizar' }}
+          </app-button>
+        }
+      </div>
+    </div>
+  }
+</div>

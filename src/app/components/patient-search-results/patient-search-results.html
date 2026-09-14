@@ -1,0 +1,39 @@
+<div
+  class="absolute top-full right-0 left-0 z-20 mt-1 max-h-80 overflow-y-auto rounded-md border border-line bg-surface shadow-card"
+  role="listbox"
+>
+  @if (loading()) {
+    <p class="px-3.5 py-3 text-sm text-ink-muted">Buscando…</p>
+  } @else if (results().length > 0) {
+    <ul>
+      @for (result of results(); track result.id) {
+        <li>
+          <a
+            [routerLink]="['/pacientes', result.id]"
+            (click)="select()"
+            class="flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm hover:bg-surface-muted focus-visible:bg-surface-muted focus-visible:outline-none"
+          >
+            <span class="flex min-w-0 flex-col">
+              <span class="truncate font-medium text-ink">{{ result.fullName }}</span>
+              <span class="text-xs text-ink-muted">Folio {{ result.folio }} · {{ result.phone }}</span>
+            </span>
+            @if (result.hasAllergies) {
+              <app-badge variant="danger">Alergias</app-badge>
+            }
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="flex flex-col gap-2 px-3.5 py-3">
+      <p class="text-sm text-ink-muted">Sin coincidencias</p>
+      <button
+        type="button"
+        (click)="openCreateWithQuery()"
+        class="w-fit text-sm font-medium text-primary hover:underline focus-visible:outline-none"
+      >
+        Crear paciente con "{{ query() }}"
+      </button>
+    </div>
+  }
+</div>

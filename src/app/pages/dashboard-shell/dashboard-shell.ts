@@ -1,6 +1,9 @@
-import { Component, DestroyRef, computed, inject, viewChild } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, resource, signal, viewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
+import { Modal } from '../../components/modal/modal';
 import { NavItem } from '../../components/nav-item/nav-item';
+import { PatientQuickCreateForm } from '../../components/patient-quick-create-form/patient-quick-create-form';
+import { PatientSearchResults } from '../../components/patient-search-results/patient-search-results';
 import { SearchField } from '../../components/search-field/search-field';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { Topbar } from '../../components/topbar/topbar';
@@ -8,7 +11,11 @@ import { Role } from '../../models/auth-user.model';
 import { NavLink } from '../../models/nav-link.model';
 import { AuthService } from '../../services/local/auth.service';
 import { HotkeyService } from '../../services/local/hotkey.service';
+import { PatientApiService } from '../../services/api/patient-api.service';
+import { PatientCreateModalService } from '../../services/local/patient-create-modal.service';
 import { SidebarStateService } from '../../services/local/sidebar-state.service';
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 const ROLE_LABELS: Record<Role, string> = {
   PLATFORM_ADMIN: 'Administrador de la plataforma',
@@ -35,7 +42,7 @@ const NAV_HOTKEY_COMBOS: Record<string, string> = {
 
 @Component({
   selector: 'app-dashboard-shell',
-  imports: [NavItem, RouterOutlet, SearchField, Sidebar, Topbar],
+  imports: [Modal, NavItem, PatientQuickCreateForm, PatientSearchResults, RouterOutlet, SearchField, Sidebar, Topbar],
   host: {
     '(document:keydown)': 'onDocumentKeydown($event)',
   },
@@ -47,14 +54,31 @@ export class DashboardShell {
   private readonly router = inject(Router);
   private readonly hotkeyService = inject(HotkeyService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly patientApi = inject(PatientApiService);
   protected readonly sidebarState = inject(SidebarStateService);
+  protected readonly patientCreateModalService = inject(PatientCreateModalService);
 
   protected readonly navLinks = NAV_LINKS;
   protected readonly user = this.authService.currentUser;
 
   private readonly searchField = viewChild(SearchField);
 
+  protected readonly searchQuery = signal('');
+  private readonly debouncedSearchQuery = signal('');
+  private searchDebounceTimer?: ReturnType<typeof setTimeout>;
+
+  protected readonly searchResource = resource({
+    params: () => this.debouncedSearchQuery().trim(),
+    loader: async ({ params }) => (params ? await this.patientApi.search(params) : []),
+  });
+
   constructor() {
+    effect(() => {
+      const value = this.searchQuery();
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = setTimeout(() => this.debouncedSearchQuery.set(value), SEARCH_DEBOUNCE_MS);
+    });
+
     for (const link of NAV_LINKS) {
       const unregister = this.hotkeyService.register(NAV_HOTKEY_COMBOS[link.key], () =>
         this.router.navigate([this.navLinkPath(link)]),
@@ -94,5 +118,9 @@ export class DashboardShell {
 
   protected onDocumentKeydown(event: KeyboardEvent): void {
     this.hotkeyService.handleKeydownEvent(event);
+  }
+
+  protected onSearchResultSelected(): void {
+    this.searchQuery.set('');
   }
 }

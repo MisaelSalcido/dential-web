@@ -19,6 +19,7 @@ const VARIANT_CLASSES: Record<BadgeVariant, string> = {
     <span
       class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap"
       [class]="variantClasses()"
+      [attr.data-testid]="testId()"
     >
       <ng-content select="[icon]" />
       <ng-content />
@@ -27,6 +28,7 @@ const VARIANT_CLASSES: Record<BadgeVariant, string> = {
 })
 export class Badge {
   variant = input<BadgeVariant>('neutral');
+  testId = input<string | null>(null);
 
   protected variantClasses = computed(() => VARIANT_CLASSES[this.variant()]);
 }

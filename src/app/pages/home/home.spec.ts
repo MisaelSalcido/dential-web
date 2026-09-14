@@ -1,11 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
+import { PatientCreateModalService } from '../../services/local/patient-create-modal.service';
 import { Home } from './home';
 
 describe('Home', () => {
   let fixture: ComponentFixture<Home>;
   let router: Router;
+  let patientCreateModalService: PatientCreateModalService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -15,6 +17,7 @@ describe('Home', () => {
 
     fixture = TestBed.createComponent(Home);
     router = TestBed.inject(Router);
+    patientCreateModalService = TestBed.inject(PatientCreateModalService);
     vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     fixture.detectChanges();
   });
@@ -34,11 +37,21 @@ describe('Home', () => {
     expect(buttons.some((button) => button.textContent?.includes('Buscar paciente'))).toBe(true);
   });
 
-  it('should navigate to /pacientes when a quick action is clicked', () => {
+  it('should open the patient create modal when "Nuevo paciente" is clicked, without navigating', () => {
     const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('button'));
     const newPatientButton = buttons.find((button) => button.textContent?.includes('Nuevo paciente'));
 
     newPatientButton!.click();
+
+    expect(patientCreateModalService.isOpen()).toBe(true);
+    expect(router.navigateByUrl).not.toHaveBeenCalled();
+  });
+
+  it('should navigate to /pacientes when "Buscar paciente" is clicked', () => {
+    const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('button'));
+    const searchPatientButton = buttons.find((button) => button.textContent?.includes('Buscar paciente'));
+
+    searchPatientButton!.click();
 
     expect(router.navigateByUrl).toHaveBeenCalledWith('/pacientes');
   });

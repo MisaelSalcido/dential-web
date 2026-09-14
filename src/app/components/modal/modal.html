@@ -1,0 +1,25 @@
+@if (open()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40" (click)="close()"></div>
+    <div
+      #dialog
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [attr.aria-label]="ariaLabel()"
+      class="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-surface p-6 shadow-lg focus:outline-none"
+    >
+      <button
+        type="button"
+        aria-label="Cerrar"
+        class="absolute top-4 right-4 rounded-md p-1 text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/12"
+        (click)="close()"
+      >
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+      <ng-content />
+    </div>
+  </div>
+}

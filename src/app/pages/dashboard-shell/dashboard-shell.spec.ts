@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
+import { PatientApiService } from '../../services/api/patient-api.service';
 import { AuthService } from '../../services/local/auth.service';
 import { HotkeyService } from '../../services/local/hotkey.service';
 import { DashboardShell } from './dashboard-shell';
@@ -35,6 +36,7 @@ describe('DashboardShell', () => {
       imports: [DashboardShell],
       providers: [
         { provide: AuthService, useValue: authService },
+        { provide: PatientApiService, useValue: { search: vi.fn().mockResolvedValue([]) } },
         provideRouter([
           { path: '', component: RouteStub },
           { path: 'pacientes', component: RouteStub },
@@ -92,6 +94,26 @@ describe('DashboardShell', () => {
     fixture.detectChanges();
 
     expect(input.value).toBe('Juan');
+  });
+
+  it('should search for patients after typing and render the results dropdown', async () => {
+    const patientApi = TestBed.inject(PatientApiService) as unknown as { search: ReturnType<typeof vi.fn> };
+    patientApi.search.mockResolvedValue([
+      { id: 'p1', fullName: 'Jorge Aguilar Ortiz', folio: '000001', phone: '5544218890', edad: 38, hasAllergies: false, lastVisitAt: null },
+    ]);
+
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('[topbar-search] input');
+    input.value = 'Jorge';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(patientApi.search).toHaveBeenCalledWith('Jorge');
+    expect(fixture.nativeElement.textContent).toContain('Jorge Aguilar Ortiz');
   });
 
   it('should toggle the sidebar collapsed state when the collapse control is clicked', () => {
